@@ -128,3 +128,41 @@ dist
 .yarn/build-state.yml
 .yarn/install-state.gz
 .pnp.*
+
+# Angular specific files
+.angular
+.angular/cache
+.angular/stats.json
+
+# Angular build output
+dist/
+
+# IDE specific files
+.idea/
+.vscode/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Visual Studio specific
+.vs/
+
+# ASP.NET specific
+bin/
+obj/
+
+# Publish output
+.publish/
+
+# ASP.NET user-specific files
+*.swp
+*.userprefs
+
+# Rider/JetBrains specific files
+.idea/
+*.iml
+
+# ASP.NET secret manager
+secrets.json
+*.csproj.user
