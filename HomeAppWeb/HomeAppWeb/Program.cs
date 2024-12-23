@@ -8,6 +8,7 @@ using HomeAppWeb.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -15,6 +16,9 @@ using System.Text;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Enable PII logging
+IdentityModelEventSource.ShowPII = true;
 
 // Add services to the container.
 builder.Services.AddDbContext<DatabaseContext>(options =>
@@ -40,6 +44,19 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+    options.Events = new JwtBearerEvents
+    {
+        OnAuthenticationFailed = context =>
+        {
+            Console.WriteLine("OnAuthenticationFailed: " + context.Exception.Message);
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            Console.WriteLine("OnTokenValidated: " + context.SecurityToken);
+            return Task.CompletedTask;
+        }
     };
 });
 
@@ -70,7 +87,32 @@ builder.Services.AddCors(options =>
     });
 });
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(opt =>
+{
+    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        BearerFormat = "JWT",
+        Description = "JWT Authorization header using the Bearer scheme.",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer"
+    });
+    opt.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id = "Bearer",
+                            Type = ReferenceType.SecurityScheme
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+});
 var app = builder.Build();
 
 // Seed roles
@@ -98,27 +140,19 @@ async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
 });*/
 // Configure the HTTP request pipeline.
 
-
-
-
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger(options =>
     {
         options.RouteTemplate = "/openapi/{documentName}.json";
     });
-    app.MapScalarApiReference(options =>
+    app.MapScalarApiReference(opt =>
     {
-        options
-        .WithPreferredScheme("Bearer")
-        .WithHttpBearerAuthentication(bearer =>
-            {
-                bearer.Token = "YourSuperSecretKeyThatIsAtLeast32CharactersLong";
-            });
+        opt.Title = "Scalar Example";
+        opt.Theme = ScalarTheme.Kepler;
+        opt.DefaultHttpClient = new(ScalarTarget.Http, ScalarClient.Http11);
     });
 }
-
-
 
 app.UseHttpsRedirection();
 app.UseRouting();

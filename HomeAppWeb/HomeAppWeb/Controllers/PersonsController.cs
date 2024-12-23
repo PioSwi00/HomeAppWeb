@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace HomeAppWeb.Controllers
@@ -41,9 +42,26 @@ namespace HomeAppWeb.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult> PostPerson(Person person)
+        [Authorize(Roles = "Admin,User")]
+        public async Task<ActionResult> PostPerson(CreatePersonDTO createPersonDTO)
         {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Pobierz UserId z kontekstu uwierzytelnienia
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized("User ID not found in token.");
+            }
+
+            var person = new Person
+            {
+                PersonId = Guid.NewGuid(),
+                UserId = userId,
+                FirstName = createPersonDTO.FirstName,
+                LastName = createPersonDTO.LastName,
+                BirthDate = createPersonDTO.BirthDate,
+                DeathDate = createPersonDTO.DeathDate
+            };
+
             await _personService.AddAsync(person);
             return CreatedAtAction(nameof(GetPerson), new { id = person.PersonId }, person);
         }
@@ -74,8 +92,15 @@ namespace HomeAppWeb.Controllers
         public Guid PersonId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime BirthDate { get; set; }
-        public DateTime? DeathDate { get; set; }
+        public DateOnly BirthDate { get; set; }
+        public DateOnly? DeathDate { get; set; }
+    }
+    public class CreatePersonDTO
+    {
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateOnly BirthDate { get; set; }
+        public DateOnly? DeathDate { get; set; }
     }
 }
 

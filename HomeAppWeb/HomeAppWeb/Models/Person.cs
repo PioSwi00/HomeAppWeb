@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace HomeAppWeb.Models
@@ -10,17 +11,26 @@ namespace HomeAppWeb.Models
     {
         [Key]
         public Guid PersonId { get; set; }
+
+        [Required]
         public string FirstName { get; set; }
+
+        [Required]
         public string LastName { get; set; }
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
-        public DateTime BirthDate { get; set; }
-        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
-        public DateTime? DeathDate { get; set; }
+
+          
+        public DateOnly BirthDate { get; set; }
+              
+        public DateOnly? DeathDate { get; set; }
+
+        [Required]
         public string UserId { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(UserId))]
+        [Required]
         public User User { get; set; }
-
     }
+
+    
 }

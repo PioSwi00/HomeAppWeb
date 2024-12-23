@@ -1,6 +1,5 @@
 using HomeAppWeb.Interface.Services;
 using HomeAppWeb.Models;
-using HomeAppWeb.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -55,6 +54,12 @@ namespace HomeAppWeb.Controllers
             }
             return Unauthorized();
         }
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return Ok();
+        }
     }
 
     public class LoginModel
@@ -71,4 +76,3 @@ namespace HomeAppWeb.Controllers
         public string LastName { get; set; }
     }
 }
-
