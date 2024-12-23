@@ -1,9 +1,7 @@
 using HomeAppWeb.Interface.Services;
 using HomeAppWeb.Models;
-using HomeAppWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -30,7 +28,7 @@ namespace HomeAppWeb.Controllers
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<User>> GetUser(Guid id)
+        public async Task<ActionResult<User>> GetUser(string id)
         {
             var user = await _userService.GetByIdAsync(id);
             if (user == null)
@@ -45,14 +43,14 @@ namespace HomeAppWeb.Controllers
         public async Task<ActionResult> PostUser(User user)
         {
             await _userService.AddAsync(user);
-            return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutUser(Guid id, User user)
+        public async Task<IActionResult> PutUser(string id, User user)
         {
-            if (id != user.UserId)
+            if (id != user.Id)
             {
                 return BadRequest();
             }
@@ -63,7 +61,7 @@ namespace HomeAppWeb.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(Guid id)
+        public async Task<IActionResult> DeleteUser(string id)
         {
             await _userService.DeleteAsync(id);
             return NoContent();

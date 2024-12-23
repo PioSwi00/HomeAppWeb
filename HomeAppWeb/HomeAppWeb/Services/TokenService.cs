@@ -26,7 +26,7 @@ namespace HomeAppWeb.Services
                 new Claim(JwtRegisteredClaimNames.Sub, _configuration["Jwt:Subject"]),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-                new Claim("UserId", user.UserId.ToString()),
+                new Claim("UserId", user.Id), 
                 new Claim("Email", user.Email),
                 new Claim("FirstName", user.FirstName),
                 new Claim("LastName", user.LastName),
@@ -46,3 +46,4 @@ namespace HomeAppWeb.Services
         }
     }
 }
+

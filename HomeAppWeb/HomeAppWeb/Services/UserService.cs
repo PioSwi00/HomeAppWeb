@@ -21,7 +21,7 @@ namespace HomeAppWeb.Services
             return await _unitOfWork.Users.GetAllAsync();
         }
 
-        public async Task<User> GetByIdAsync(Guid id)
+        public async Task<User> GetByIdAsync(string id)
         {
             return await _unitOfWork.Users.GetByIdAsync(id);
         }
@@ -38,7 +38,7 @@ namespace HomeAppWeb.Services
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(string id)
         {
             var user = await _unitOfWork.Users.GetByIdAsync(id);
             if (user != null)
@@ -47,5 +47,7 @@ namespace HomeAppWeb.Services
                 await _unitOfWork.CompleteAsync();
             }
         }
+
+        
     }
 }

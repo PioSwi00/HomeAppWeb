@@ -8,7 +8,7 @@ namespace HomeAppWeb.Interfaces.Repositories
     public interface IUserEventRepository
     {
         Task<IEnumerable<UserEvent>> GetAllAsync();
-        Task<UserEvent> GetByIdAsync(Guid userId, string eventId);
+        Task<UserEvent> GetByIdAsync(string userId, string eventId);
         Task AddAsync(UserEvent userEvent);
         void Update(UserEvent userEvent);
         void Delete(UserEvent userEvent);

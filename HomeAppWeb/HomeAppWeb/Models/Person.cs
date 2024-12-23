@@ -12,9 +12,11 @@ namespace HomeAppWeb.Models
         public Guid PersonId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
         public DateTime BirthDate { get; set; }
-        public DateTime? DeathDate { get; set; } // Nullable for living persons
-        public Guid UserId { get; set; }
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
+        public DateTime? DeathDate { get; set; }
+        public string UserId { get; set; }
 
         [JsonIgnore]
         [ForeignKey(nameof(UserId))]

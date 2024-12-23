@@ -22,7 +22,7 @@ namespace HomeAppWeb.Repos
             return await _context.UserEvents.ToListAsync();
         }
 
-        public async Task<UserEvent> GetByIdAsync(Guid userId, string eventId)
+        public async Task<UserEvent> GetByIdAsync(string userId, string eventId)
         {
             return await _context.UserEvents.FindAsync(userId, eventId);
         }

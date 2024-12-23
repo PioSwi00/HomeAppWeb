@@ -8,9 +8,9 @@ namespace HomeAppWeb.Interfaces.Services
     public interface IUserEventService
     {
         Task<IEnumerable<UserEvent>> GetAllAsync();
-        Task<UserEvent> GetByIdAsync(Guid userId, string eventId);
+        Task<UserEvent> GetByIdAsync(string userId, string eventId);
         Task AddAsync(UserEvent userEvent);
         Task UpdateAsync(UserEvent userEvent);
-        Task DeleteAsync(Guid userId, string eventId);
+        Task DeleteAsync(string userId, string eventId);
     }
 }

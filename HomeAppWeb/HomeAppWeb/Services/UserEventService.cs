@@ -21,7 +21,7 @@ namespace HomeAppWeb.Services
             return await _unitOfWork.UserEvents.GetAllAsync();
         }
 
-        public async Task<UserEvent> GetByIdAsync(Guid userId, string eventId)
+        public async Task<UserEvent> GetByIdAsync(string userId, string eventId)
         {
             return await _unitOfWork.UserEvents.GetByIdAsync(userId, eventId);
         }
@@ -38,7 +38,7 @@ namespace HomeAppWeb.Services
             await _unitOfWork.CompleteAsync();
         }
 
-        public async Task DeleteAsync(Guid userId, string eventId)
+        public async Task DeleteAsync(string userId, string eventId)
         {
             var userEvent = await _unitOfWork.UserEvents.GetByIdAsync(userId, eventId);
             if (userEvent != null)

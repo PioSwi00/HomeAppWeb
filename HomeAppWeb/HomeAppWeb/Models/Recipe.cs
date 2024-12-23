@@ -13,7 +13,7 @@ namespace HomeAppWeb.Models
         public string Name { get; set; }
         public string Ingredients { get; set; }
         public string Instructions { get; set; }
-        public Guid UserId { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey(nameof(UserId))]
         public User User { get; set; }

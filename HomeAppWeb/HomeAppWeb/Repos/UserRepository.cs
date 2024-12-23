@@ -1,8 +1,11 @@
-using HomeAppWeb.Data;
 using HomeAppWeb.Models;
+using HomeAppWeb.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using HomeAppWeb.Data;
 
-public class UserRepository
+public class UserRepository : IUserRepository
 {
     private readonly DatabaseContext _context;
 
@@ -11,14 +14,14 @@ public class UserRepository
         _context = context;
     }
 
-    public async Task<User> GetUserByIdAsync(string userId)
-    {
-        return await _context.Users.FindAsync(userId);
-    }
-
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users.ToListAsync();
+    }
+
+    public async Task<User> GetByIdAsync(string id)
+    {
+        return await _context.Users.FindAsync(id);
     }
 
     public async Task AddAsync(User user)
@@ -27,20 +30,16 @@ public class UserRepository
         await _context.SaveChangesAsync();
     }
 
-    public async Task UpdateAsync(User user)
+    public void Update(User user)
     {
         _context.Users.Update(user);
-        await _context.SaveChangesAsync();
+        _context.SaveChanges();
     }
 
-    public async Task DeleteAsync(string userId)
+    public void Delete(User user)
     {
-        var user = await _context.Users.FindAsync(userId);
-        if (user != null)
-        {
-            _context.Users.Remove(user);
-            await _context.SaveChangesAsync();
-        }
+        _context.Users.Remove(user);
+        _context.SaveChanges();
     }
 }
 

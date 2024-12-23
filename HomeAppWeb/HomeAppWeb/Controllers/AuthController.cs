@@ -30,7 +30,8 @@ namespace HomeAppWeb.Controllers
                 UserName = model.Email,
                 Email = model.Email,
                 FirstName = model.FirstName,
-                LastName = model.LastName
+                LastName = model.LastName,
+                Role = "User" // Ustaw domyœln¹ rolê na "User"
             };
 
             var result = await _userManager.CreateAsync(user, model.Password);
@@ -61,6 +62,7 @@ namespace HomeAppWeb.Controllers
         public string Email { get; set; }
         public string Password { get; set; }
     }
+
     public class RegisterModel
     {
         public string Email { get; set; }
@@ -69,3 +71,4 @@ namespace HomeAppWeb.Controllers
         public string LastName { get; set; }
     }
 }
+

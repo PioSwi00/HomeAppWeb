@@ -30,7 +30,7 @@ namespace HomeAppWeb.Controllers
 
         [HttpGet("{userId}/{eventId}")]
         [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<UserEvent>> GetUserEvent(Guid userId, string eventId)
+        public async Task<ActionResult<UserEvent>> GetUserEvent(string userId, string eventId)
         {
             var userEvent = await _userEventService.GetByIdAsync(userId, eventId);
             if (userEvent == null)
@@ -50,7 +50,7 @@ namespace HomeAppWeb.Controllers
 
         [HttpPut("{userId}/{eventId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> PutUserEvent(Guid userId, string eventId, UserEvent userEvent)
+        public async Task<IActionResult> PutUserEvent(string userId, string eventId, UserEvent userEvent)
         {
             if (userId != userEvent.UserId || eventId != userEvent.EventId)
             {
@@ -63,7 +63,7 @@ namespace HomeAppWeb.Controllers
 
         [HttpDelete("{userId}/{eventId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUserEvent(Guid userId, string eventId)
+        public async Task<IActionResult> DeleteUserEvent(string userId, string eventId)
         {
             await _userEventService.DeleteAsync(userId, eventId);
             return NoContent();

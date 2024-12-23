@@ -4,7 +4,7 @@ using HomeAppWeb.Models;
 
 namespace HomeAppWeb.Data
 {
-    public class DatabaseContext: IdentityDbContext
+    public class DatabaseContext: IdentityDbContext<User>
     {
 
         public DatabaseContext()
@@ -18,9 +18,27 @@ namespace HomeAppWeb.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=HomeApp-Prod;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
+            optionsBuilder.UseSqlServer("Data Source=(localdb)\\MSSQLLocalDB;Initial Catalog=Homeapp_prod;Integrated Security=True;Connect Timeout=30;Encrypt=False;Trust Server Certificate=False;Application Intent=ReadWrite;Multi Subnet Failover=False");
         }
-        public DbSet<User> Users { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<UserEvent>()
+                .HasKey(ue => new { ue.UserId, ue.EventId });
+
+            modelBuilder.Entity<UserEvent>()
+                .HasOne(ue => ue.User)
+                .WithMany(u => u.UserEvents)
+                .HasForeignKey(ue => ue.UserId);
+
+            modelBuilder.Entity<UserEvent>()
+                .HasOne(ue => ue.Event)
+                .WithMany(e => e.UserEvents)
+                .HasForeignKey(ue => ue.EventId);
+        }
+       
         public DbSet<Event> Events { get; set; }
         public DbSet<UserEvent> UserEvents { get; set; }
         public DbSet<Bill> Bills { get; set; }

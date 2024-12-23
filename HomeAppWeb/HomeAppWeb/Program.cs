@@ -10,8 +10,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Scalar.AspNetCore;
 using System.Text;
+
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -53,7 +54,6 @@ builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IUserEventService, UserEventService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 // Register other services and repositories similarly
-
 builder.Services.AddControllers();
 builder.Services.AddAuthorization(options =>
 {
@@ -69,11 +69,8 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
-builder.Services.AddSwaggerGen(c =>
-{
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeAppWeb API", Version = "v1" });
-});
-
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 var app = builder.Build();
 
 // Seed roles
@@ -95,18 +92,40 @@ async Task SeedRolesAsync(RoleManager<IdentityRole> roleManager)
     }
 }
 
+/*builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "HomeAppWeb API", Version = "v1" });
+});*/
 // Configure the HTTP request pipeline.
+
+
+
+
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HomeAppWeb API v1"));
+    app.UseSwagger(options =>
+    {
+        options.RouteTemplate = "/openapi/{documentName}.json";
+    });
+    app.MapScalarApiReference(options =>
+    {
+        options
+        .WithPreferredScheme("Bearer")
+        .WithHttpBearerAuthentication(bearer =>
+            {
+                bearer.Token = "YourSuperSecretKeyThatIsAtLeast32CharactersLong";
+            });
+    });
 }
+
+
 
 app.UseHttpsRedirection();
 app.UseRouting();
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("AllowAll");
+
 app.MapControllers();
 
 app.Run();
