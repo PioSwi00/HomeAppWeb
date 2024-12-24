@@ -2,6 +2,7 @@ using HomeAppWeb.Interfaces.Services;
 using HomeAppWeb.Models;
 using HomeAppWeb.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,10 +16,13 @@ namespace HomeAppWeb.Controllers
     public class PersonsController : ControllerBase
     {
         private readonly IPersonService _personService;
+        private readonly UserManager<User> _userManager;
 
-        public PersonsController(IPersonService personService)
+
+        public PersonsController(IPersonService personService, UserManager<User> userManager)
         {
             _personService = personService;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -30,41 +34,72 @@ namespace HomeAppWeb.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,User")]
-        public async Task<ActionResult<Person>> GetPerson(Guid id)
+        public async Task<ActionResult<PersonDTO>> GetPerson(Guid id)
         {
             var person = await _personService.GetByIdAsync(id);
             if (person == null)
             {
                 return NotFound();
             }
-            return Ok(person);
+
+            var personDTO = new PersonDTO
+            {
+                PersonId = person.PersonId,
+                FirstName = person.FirstName,
+                LastName = person.LastName,
+                BirthDate = person.BirthDate,
+                DeathDate = person.DeathDate
+            };
+
+            return Ok(personDTO);
         }
 
         [HttpPost]
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult> PostPerson(CreatePersonDTO createPersonDTO)
         {
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Pobierz UserId z kontekstu uwierzytelnienia
-
-            if (string.IsNullOrEmpty(userId))
+            // Pobranie e-maila u퓓tkownika z tokena
+            var userEmail = User.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(userEmail))
             {
-                return Unauthorized("User ID not found in token.");
+                return Unauthorized("User email not found in token.");
             }
 
-            var person = new Person
+            // Znalezienie faktycznego identyfikatora GUID u퓓tkownika
+            var user = await _userManager.FindByEmailAsync(userEmail);
+            if (user == null)
             {
-                PersonId = Guid.NewGuid(),
-                UserId = userId,
-                FirstName = createPersonDTO.FirstName,
-                LastName = createPersonDTO.LastName,
-                BirthDate = createPersonDTO.BirthDate,
-                DeathDate = createPersonDTO.DeathDate
-            };
+                return Unauthorized("User not found in the database.");
+            }
 
-            await _personService.AddAsync(person);
-            return CreatedAtAction(nameof(GetPerson), new { id = person.PersonId }, person);
+            var userId = user.Id; // Faktyczny GUID u퓓tkownika
+
+            try
+            {
+                // Utworzenie nowej osoby
+                var person = new Person
+                {
+                    PersonId = Guid.NewGuid(),
+                    UserId = userId, // GUID u퓓tkownika
+                    FirstName = createPersonDTO.FirstName,
+                    LastName = createPersonDTO.LastName,
+                    BirthDate = createPersonDTO.BirthDate,
+                    DeathDate = createPersonDTO.DeathDate
+                };
+
+                // Zapisanie osoby do bazy danych
+                await _personService.AddAsync(person);
+
+                return CreatedAtAction(nameof(GetPerson), new { id = person.PersonId }, person);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error while creating person: {ex.Message}");
+                return StatusCode(500, "An error occurred while creating the person.");
+            }
         }
+
+
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
@@ -87,7 +122,7 @@ namespace HomeAppWeb.Controllers
             return NoContent();
         }
     }
-    public class PersonDTO
+      public class PersonDTO
     {
         public Guid PersonId { get; set; }
         public string FirstName { get; set; }
@@ -95,6 +130,7 @@ namespace HomeAppWeb.Controllers
         public DateOnly BirthDate { get; set; }
         public DateOnly? DeathDate { get; set; }
     }
+
     public class CreatePersonDTO
     {
         public string FirstName { get; set; }
