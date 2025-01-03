@@ -10,8 +10,7 @@ namespace HomeAppWeb.Interfaces.Repositories
         Task<IEnumerable<Recipe>> GetAllAsync();
         Task<Recipe> GetByIdAsync(Guid id);
         Task AddAsync(Recipe recipe);
-        void Update(Recipe recipe);
-        void Delete(Recipe recipe);
+        Task UpdateAsync(Recipe recipe);
+        Task DeleteAsync(Recipe recipe);
     }
 }
-

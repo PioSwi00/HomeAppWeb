@@ -10,11 +10,11 @@ namespace HomeAppWeb.Interfaces
         IEventRepository Events { get; }
         IUserEventRepository UserEvents { get; }
         IBillRepository Bills { get; }
-        ITodoRepository Todos { get; }
-        ITodoItemRepository TodoItems { get; }
+        IToDoRepository ToDos { get; }
         IRecipeRepository Recipes { get; }
         IActionLogRepository ActionLogs { get; }
         IPersonRepository Persons { get; }
         Task<int> CompleteAsync();
     }
 }
+

@@ -58,29 +58,26 @@ namespace HomeAppWeb.Controllers
         [Authorize(Roles = "Admin,User")]
         public async Task<ActionResult> PostPerson(CreatePersonDTO createPersonDTO)
         {
-            // Pobranie e-maila u퓓tkownika z tokena
             var userEmail = User.FindFirstValue(ClaimTypes.Email);
             if (string.IsNullOrEmpty(userEmail))
             {
                 return Unauthorized("User email not found in token.");
             }
 
-            // Znalezienie faktycznego identyfikatora GUID u퓓tkownika
             var user = await _userManager.FindByEmailAsync(userEmail);
             if (user == null)
             {
                 return Unauthorized("User not found in the database.");
             }
 
-            var userId = user.Id; // Faktyczny GUID u퓓tkownika
+            var userId = user.Id; 
 
             try
             {
-                // Utworzenie nowej osoby
                 var person = new Person
                 {
                     PersonId = Guid.NewGuid(),
-                    UserId = userId, // GUID u퓓tkownika
+                    UserId = userId, 
                     FirstName = createPersonDTO.FirstName,
                     LastName = createPersonDTO.LastName,
                     BirthDate = createPersonDTO.BirthDate,

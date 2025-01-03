@@ -1,17 +1,14 @@
-using HomeAppWeb.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using HomeAppWeb.Models;
 
 namespace HomeAppWeb.Interfaces.Repositories
 {
-    public interface ITodoRepository
+    public interface IToDoRepository
     {
-        Task<IEnumerable<Todo>> GetAllAsync();
-        Task<Todo> GetByIdAsync(Guid id);
-        Task AddAsync(Todo todo);
-        void Update(Todo todo);
-        void Delete(Todo todo);
+        Task<IEnumerable<ToDo>> GetAllToDosAsync();
+        Task<ToDo> GetToDoByIdAsync(Guid id);
+        Task AddToDoAsync(ToDo toDo);
+        Task UpdateToDoAsync(ToDo toDo);
+        Task DeleteToDoAsync(Guid id);
     }
 }
-
+            

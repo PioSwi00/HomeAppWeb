@@ -16,22 +16,25 @@ namespace HomeAppWeb.Repos
             Events = new EventRepository(_context);
             UserEvents = new UserEventRepository(_context);
             Bills = new BillRepository(_context);
-            Todos = new TodoRepository(_context);
-            TodoItems = new TodoItemRepository(_context);
+
+            ToDos = new ToDoRepository(_context);
+
             Recipes = new RecipeRepository(_context);
             ActionLogs = new ActionLogRepository(_context);
             Persons = new PersonRepository(_context);
+            
         }
 
         public IUserRepository Users { get; private set; }
         public IEventRepository Events { get; private set; }
         public IUserEventRepository UserEvents { get; private set; }
         public IBillRepository Bills { get; private set; }
-        public ITodoRepository Todos { get; private set; }
-        public ITodoItemRepository TodoItems { get; private set; }
+        public IToDoRepository ToDos { get; private set; }
+
         public IRecipeRepository Recipes { get; private set; }
         public IActionLogRepository ActionLogs { get; private set; }
         public IPersonRepository Persons { get; private set; }
+       
 
         public async Task<int> CompleteAsync()
         {

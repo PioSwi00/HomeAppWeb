@@ -19,12 +19,23 @@ namespace HomeAppWeb.Repos
 
         public async Task<IEnumerable<Recipe>> GetAllAsync()
         {
-            return await _context.Recipes.ToListAsync();
+            return await _context.Recipes
+                .Include(r => r.User)
+                .ToListAsync();
         }
 
         public async Task<Recipe> GetByIdAsync(Guid id)
         {
-            return await _context.Recipes.FindAsync(id);
+            var recipe = await _context.Recipes
+                .Include(r => r.User)
+                .FirstOrDefaultAsync(r => r.RecipeId == id);
+
+            if (recipe == null)
+            {
+                throw new KeyNotFoundException($"Recipe with ID {id} not found.");
+            }
+
+            return recipe;
         }
 
         public async Task AddAsync(Recipe recipe)
@@ -32,14 +43,16 @@ namespace HomeAppWeb.Repos
             await _context.Recipes.AddAsync(recipe);
         }
 
-        public void Update(Recipe recipe)
+        public async Task UpdateAsync(Recipe recipe)
         {
             _context.Recipes.Update(recipe);
+            await _context.SaveChangesAsync();
         }
 
-        public void Delete(Recipe recipe)
+        public async Task DeleteAsync(Recipe recipe)
         {
             _context.Recipes.Remove(recipe);
+            await _context.SaveChangesAsync();
         }
     }
 }

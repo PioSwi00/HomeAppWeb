@@ -18,14 +18,10 @@ public class ActionLogMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
-        // Call the next middleware in the pipeline
         await _next(context);
-
-        // Resolve the UserManager service from the request scope
         var userManager = context.RequestServices.GetRequiredService<UserManager<User>>();
         var dbContext = context.RequestServices.GetRequiredService<DatabaseContext>();
 
-        // Log the action after the request has been processed
         var userEmail = context.User.FindFirstValue(ClaimTypes.Email);
         if (!string.IsNullOrEmpty(userEmail))
         {

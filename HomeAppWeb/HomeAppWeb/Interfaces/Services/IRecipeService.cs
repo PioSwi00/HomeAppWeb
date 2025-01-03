@@ -12,5 +12,7 @@ namespace HomeAppWeb.Interfaces.Services
         Task AddAsync(Recipe recipe);
         Task UpdateAsync(Recipe recipe);
         Task DeleteAsync(Guid id);
+    
     }
 }
+

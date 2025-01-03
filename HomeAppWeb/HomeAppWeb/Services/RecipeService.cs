@@ -34,7 +34,7 @@ namespace HomeAppWeb.Services
 
         public async Task UpdateAsync(Recipe recipe)
         {
-            _unitOfWork.Recipes.Update(recipe);
+            _unitOfWork.Recipes.UpdateAsync(recipe);
             await _unitOfWork.CompleteAsync();
         }
 
@@ -43,9 +43,16 @@ namespace HomeAppWeb.Services
             var recipe = await _unitOfWork.Recipes.GetByIdAsync(id);
             if (recipe != null)
             {
-                _unitOfWork.Recipes.Delete(recipe);
+                _unitOfWork.Recipes.DeleteAsync(recipe);
                 await _unitOfWork.CompleteAsync();
             }
         }
+
+        
+
+        
+
+     
     }
 }
+

@@ -1,16 +1,19 @@
-using HomeAppWeb.Models;
+﻿using HomeAppWeb.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace HomeAppWeb.Interfaces.Services
 {
-    public interface ITodoService
+    public interface IToDoService
     {
-        Task<IEnumerable<Todo>> GetAllAsync();
-        Task<Todo> GetByIdAsync(Guid id);
-        Task AddAsync(Todo todo);
-        Task UpdateAsync(Todo todo);
-        Task DeleteAsync(Guid id);
+        Task<IEnumerable<ToDo>> GetUserToDosAsync(string userId);
+        Task<ToDo> GetToDoDetailsAsync(Guid id);
+        Task CreateToDoAsync(ToDo toDo, List<string> assignedUserIds);
+        Task UpdateToDoStatusAsync(Guid id, ToDoStatus status, string userId);
+        Task DeleteToDoAsync(Guid id, string userId);
     }
 }
+
+
+

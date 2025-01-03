@@ -16,8 +16,8 @@ namespace HomeAppWeb.Models
         [Required]
         public string Role { get; set; } // "User" or "Admin"
         public ICollection<UserEvent> UserEvents { get; set; }
+        public ICollection<ToDo> CreatedToDos { get; set; }
         public ICollection<Bill> Bills { get; set; }
-        public ICollection<Todo> Todos { get; set; }
         public ICollection<ActionLog> ActionLogs { get; set; }
         public ICollection<Recipe> Recipes { get; set; }
     }

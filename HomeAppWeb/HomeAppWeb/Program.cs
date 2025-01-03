@@ -15,6 +15,7 @@ using System.Text;
 
 using Scalar.AspNetCore;
 using System.Text.Json.Serialization;
+using HomeAppWeb.Interfaces.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,17 +65,18 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IEventService, EventService>();
-builder.Services.AddScoped<ITodoItemService, TodoItemService>();
+
 builder.Services.AddScoped<IBillService, BillService>();
 builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddScoped<IActionLogService, ActionLogService>();
 builder.Services.AddScoped<IPersonService, PersonService>();
 builder.Services.AddScoped<IUserEventService, UserEventService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-
+builder.Services.AddScoped<IToDoService, ToDoService>();
 // Register other services and repositories similarly
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
+    options.JsonSerializerOptions.ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve;
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     options.JsonSerializerOptions.Converters.Add(new DateOnlyJsonConverter());
 });

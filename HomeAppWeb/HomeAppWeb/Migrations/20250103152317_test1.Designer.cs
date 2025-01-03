@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeAppWeb.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20241223174819_init2")]
-    partial class init2
+    [Migration("20250103152317_test1")]
+    partial class test1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -97,17 +97,36 @@ namespace HomeAppWeb.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("HomeAppWeb.Models.Ingredient", b =>
+                {
+                    b.Property<Guid>("IngredientId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Quantity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("IngredientId");
+
+                    b.ToTable("Ingredients");
+                });
+
             modelBuilder.Entity("HomeAppWeb.Models.Person", b =>
                 {
                     b.Property<Guid>("PersonId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("BirthDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("BirthDate")
+                        .HasColumnType("date");
 
-                    b.Property<DateTime?>("DeathDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly?>("DeathDate")
+                        .HasColumnType("date");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
@@ -134,9 +153,8 @@ namespace HomeAppWeb.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Ingredients")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("DateAdded")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Instructions")
                         .IsRequired()
@@ -144,7 +162,11 @@ namespace HomeAppWeb.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int?>("Rating")
+                        .HasColumnType("int");
 
                     b.Property<string>("UserId")
                         .IsRequired()
@@ -157,51 +179,74 @@ namespace HomeAppWeb.Migrations
                     b.ToTable("Recipes");
                 });
 
-            modelBuilder.Entity("HomeAppWeb.Models.Todo", b =>
+            modelBuilder.Entity("HomeAppWeb.Models.RecipeIngredient", b =>
                 {
-                    b.Property<Guid>("TodoId")
+                    b.Property<Guid>("RecipeId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("IngredientId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("RecipeId", "IngredientId");
+
+                    b.HasIndex("IngredientId");
+
+                    b.ToTable("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("HomeAppWeb.Models.ToDo", b =>
+                {
+                    b.Property<Guid>("ToDoId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("CreatorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("ToDoId");
+
+                    b.HasIndex("CreatorId");
+
+                    b.ToTable("ToDos");
+                });
+
+            modelBuilder.Entity("HomeAppWeb.Models.ToDoUser", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ToDoId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.HasKey("TodoId");
+                    b.HasKey("Id");
+
+                    b.HasIndex("ToDoId");
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Todos");
-                });
-
-            modelBuilder.Entity("HomeAppWeb.Models.TodoItem", b =>
-                {
-                    b.Property<Guid>("TodoItemId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsCompleted")
-                        .HasColumnType("bit");
-
-                    b.Property<Guid>("TodoId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("TodoItemId");
-
-                    b.HasIndex("TodoId");
-
-                    b.ToTable("TodoItems");
+                    b.ToTable("ToDoUsers");
                 });
 
             modelBuilder.Entity("HomeAppWeb.Models.User", b =>
@@ -473,26 +518,53 @@ namespace HomeAppWeb.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("HomeAppWeb.Models.Todo", b =>
+            modelBuilder.Entity("HomeAppWeb.Models.RecipeIngredient", b =>
                 {
-                    b.HasOne("HomeAppWeb.Models.User", "User")
-                        .WithMany("Todos")
-                        .HasForeignKey("UserId")
+                    b.HasOne("HomeAppWeb.Models.Ingredient", "Ingredient")
+                        .WithMany("RecipeIngredients")
+                        .HasForeignKey("IngredientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("User");
+                    b.HasOne("HomeAppWeb.Models.Recipe", "Recipe")
+                        .WithMany("RecipeIngredients")
+                        .HasForeignKey("RecipeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Ingredient");
+
+                    b.Navigation("Recipe");
                 });
 
-            modelBuilder.Entity("HomeAppWeb.Models.TodoItem", b =>
+            modelBuilder.Entity("HomeAppWeb.Models.ToDo", b =>
                 {
-                    b.HasOne("HomeAppWeb.Models.Todo", "Todo")
-                        .WithMany("TodoItems")
-                        .HasForeignKey("TodoId")
+                    b.HasOne("HomeAppWeb.Models.User", "Creator")
+                        .WithMany("CreatedToDos")
+                        .HasForeignKey("CreatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Todo");
+                    b.Navigation("Creator");
+                });
+
+            modelBuilder.Entity("HomeAppWeb.Models.ToDoUser", b =>
+                {
+                    b.HasOne("HomeAppWeb.Models.ToDo", "ToDo")
+                        .WithMany("AssignedUsers")
+                        .HasForeignKey("ToDoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HomeAppWeb.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("ToDo");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("HomeAppWeb.Models.UserEvent", b =>
@@ -570,9 +642,19 @@ namespace HomeAppWeb.Migrations
                     b.Navigation("UserEvents");
                 });
 
-            modelBuilder.Entity("HomeAppWeb.Models.Todo", b =>
+            modelBuilder.Entity("HomeAppWeb.Models.Ingredient", b =>
                 {
-                    b.Navigation("TodoItems");
+                    b.Navigation("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("HomeAppWeb.Models.Recipe", b =>
+                {
+                    b.Navigation("RecipeIngredients");
+                });
+
+            modelBuilder.Entity("HomeAppWeb.Models.ToDo", b =>
+                {
+                    b.Navigation("AssignedUsers");
                 });
 
             modelBuilder.Entity("HomeAppWeb.Models.User", b =>
@@ -581,9 +663,9 @@ namespace HomeAppWeb.Migrations
 
                     b.Navigation("Bills");
 
-                    b.Navigation("Recipes");
+                    b.Navigation("CreatedToDos");
 
-                    b.Navigation("Todos");
+                    b.Navigation("Recipes");
 
                     b.Navigation("UserEvents");
                 });
